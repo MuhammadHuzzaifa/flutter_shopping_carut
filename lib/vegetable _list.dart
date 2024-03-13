@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_shopping_carut/cart_model.dart';
+import 'package:flutter_shopping_carut/cart_provider.dart';
+import 'package:flutter_shopping_carut/db_helper.dart';
+import 'package:provider/provider.dart';
 class VagetableList extends StatefulWidget {
   const VagetableList({super.key});
 
@@ -7,6 +11,8 @@ class VagetableList extends StatefulWidget {
 }
 
 class _VagetableListState extends State<VagetableList> {
+  DBHelper? dbHelper = DBHelper();
+
   List<String> productName = ['Tomato' , 'Ptato' , 'onion' , 'Carrot' , 'Lady Finger' , 'Salad Leaf','Fresh Cucmbers','Bell Paper',] ;
   List<String> productUnit = ['KG' , 'Dozen' , 'KG' , 'Dozen' , 'KG' , 'KG','KG','KG',] ;
   List<int> productPrice = [100, 200 , 250 , 150 , 540, 360 ,876,250 ] ;
@@ -19,12 +25,13 @@ class _VagetableListState extends State<VagetableList> {
     'https://image.shutterstock.com/image-photo/salad_leaf-isolated-on-white-background-600w-343381544.jpg' ,
     'https://image.shutterstock.com/image-photo/cucmbers-isolated-on-white-background-600w-136354208.jpg' ,
     'https://image.shutterstock.com/image-photo/bell_paper-isolated-on-white-background-600w-726224167.jpg',
-  ] ;
+  ];
   @override
   Widget build(BuildContext context) {
+    final cart = Provider.of<CartProvider>(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text("Vegetable  List",
+        title: Text("Vagetable List",
           style: TextStyle(color: Colors.white, fontFamily: 'YourCustomFont', fontSize: 24.0, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
@@ -71,15 +78,39 @@ class _VagetableListState extends State<VagetableList> {
                                       SizedBox(height: 5,),
                                       Align(
                                         alignment: Alignment.centerRight,
-                                        child: Container(
-                                          height: 30,
-                                          width: 90,
-                                          decoration: BoxDecoration(
-                                              color: Colors.blue,
-                                              borderRadius: BorderRadius.circular(10)
-                                          ),
-                                          child: Center(
-                                            child: Text('Add to cart',style: TextStyle(color: Colors.white),),
+                                        child: InkWell(
+                                          onTap: (){
+                                            dbHelper!.insert(
+                                                Cart(
+                                                    id: index,
+                                                    productId: index.toString(),
+                                                    productName: productName[index].toString(),
+                                                    productPrice:  productPrice[index],
+                                                    intialPrice:  productPrice[index],
+                                                    quantity: 1,
+                                                    unitTag: productUnit[index].toString(),
+                                                    image: productImage[index].toString()
+
+                                                )
+                                            ).then((value) {
+                                              print("product is added to cart");
+                                              cart.addTotalPrice(double.parse(productPrice[index].toString()));
+                                              cart.addCounter();
+                                            }).onError((error, stackTrace) {
+                                              print(error.toString());
+                                            } );
+
+                                          },
+                                          child: Container(
+                                            height: 30,
+                                            width: 90,
+                                            decoration: BoxDecoration(
+                                                color: Colors.blue,
+                                                borderRadius: BorderRadius.circular(10)
+                                            ),
+                                            child: Center(
+                                              child: Text('Add to cart',style: TextStyle(color: Colors.white),),
+                                            ),
                                           ),
                                         ),
                                       )
@@ -99,7 +130,7 @@ class _VagetableListState extends State<VagetableList> {
           )
         ],
       ),
-   backgroundColor: Colors.deepOrange,
+      backgroundColor: Colors.deepOrange,
     );
   }
 }

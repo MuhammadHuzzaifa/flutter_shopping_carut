@@ -1,7 +1,13 @@
-import 'package:flutter_shopping_carut/vegetable _list.dart';
+
+import 'package:flutter_shopping_carut/cart_provider.dart';
+import 'package:flutter_shopping_carut/cart_screen.dart';
+import 'package:flutter_shopping_carut/db_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:badges/badges.dart' as badges;
 
 import 'fruit_list.dart';
+import 'vegetable _list.dart';
 
 
 class ScreenDashboard extends StatefulWidget {
@@ -23,23 +29,38 @@ class _ScreenDashboardState extends State<ScreenDashboard> {
         backgroundColor: Colors.teal,
         centerTitle: true,
         actions: [
-          Center(
-            child: Badge(
-              backgroundColor: Colors.deepOrange,
 
-              textColor: Colors.white,
-              smallSize: 8,
-              child:Icon(Icons.shopping_bag_outlined,
-              color: Colors.white,),
-            ),),
-          SizedBox(width: 25.0)
+             InkWell(
+               onTap: (){
+                 Navigator.push(context, MaterialPageRoute(builder: (context)=> CartScreen()));
+               },
+               child: Center(
+                child:badges.Badge(
+                  badgeContent:Consumer<CartProvider>(
+                         builder: (context,value , child){
+                           return Text(value.getCounter().toString(),style: TextStyle(color: Colors.white));
+                   },
+               
+                     ),
+                   //animationDuraton:Duration(milliseconds: 300),
+               
+                  child: Icon(Icons.shopping_bag_outlined),
+                ),
+                           ),
+             ),
 
+
+          SizedBox(width: 20.0)
         ],
       ),
       body: Container(
+
+
+
         color: Colors.black12,
         padding: EdgeInsets.all(16.0),
         width: double.infinity,
+
         height: double.infinity,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -54,8 +75,7 @@ class _ScreenDashboardState extends State<ScreenDashboard> {
               style: ElevatedButton.styleFrom(
 
 
-                primary: Colors.deepPurpleAccent,
-                onPrimary: Colors.white,
+                foregroundColor: Colors.white, backgroundColor: Colors.deepPurpleAccent,
               ),
             ),
             ElevatedButton.icon(
@@ -66,14 +86,20 @@ class _ScreenDashboardState extends State<ScreenDashboard> {
               label: Text(' vegetable    Dashboard',
                   style: TextStyle(color: Colors.white, fontFamily: 'YourCustomFont', fontSize: 24.0, fontWeight: FontWeight.bold)),
               style: ElevatedButton.styleFrom(
-                primary: Colors.deepPurpleAccent,
-                onPrimary: Colors.white,
+                foregroundColor: Colors.white, backgroundColor: Colors.deepPurpleAccent,
               ),
             ),
 
+
+
           ],
         ),
+
       ),
+
     );
   }
 }
+
+
+

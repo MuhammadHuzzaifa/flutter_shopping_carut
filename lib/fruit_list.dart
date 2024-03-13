@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_shopping_carut/cart_model.dart';
+import 'package:flutter_shopping_carut/cart_provider.dart';
+import 'package:flutter_shopping_carut/db_helper.dart';
+import 'package:provider/provider.dart';
 class FruitList extends StatefulWidget {
   const FruitList({super.key});
 
@@ -7,6 +11,8 @@ class FruitList extends StatefulWidget {
 }
 
 class _FruitListState extends State<FruitList> {
+  DBHelper? dbHelper = DBHelper();
+
   List<String> productName = ['Mango' , 'Orange' , 'Grapes' , 'Banana' , 'Chery' , 'Peach','Mixed Fruit Basket','apple',] ;
   List<String> productUnit = ['KG' , 'Dozen' , 'KG' , 'Dozen' , 'KG' , 'KG','KG','KG',] ;
   List<int> productPrice = [100, 200 , 250 , 150 , 540, 360 ,876,250 ] ;
@@ -22,6 +28,7 @@ class _FruitListState extends State<FruitList> {
   ] ;
   @override
   Widget build(BuildContext context) {
+    final cart = Provider.of<CartProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text("Fruit List",
@@ -71,15 +78,39 @@ class _FruitListState extends State<FruitList> {
                                       SizedBox(height: 5,),
                                       Align(
                                         alignment: Alignment.centerRight,
-                                        child: Container(
-                                          height: 30,
-                                          width: 90,
-                                          decoration: BoxDecoration(
-                                              color: Colors.blue,
-                                              borderRadius: BorderRadius.circular(10)
-                                          ),
-                                          child: Center(
-                                            child: Text('Add to cart',style: TextStyle(color: Colors.white),),
+                                        child: InkWell(
+                                          onTap: (){
+                                            dbHelper!.insert(
+                                              Cart(
+                                                  id: index,
+                                                  productId: index.toString(),
+                                                  productName: productName[index].toString(),
+                                                  productPrice:  productPrice[index],
+                                                  intialPrice:  productPrice[index],
+                                                  quantity: 1,
+                                                  unitTag: productUnit[index].toString(),
+                                                  image: productImage[index].toString()
+
+                                              )
+                                            ).then((value) {
+                                              print("product is added to cart");
+                                            cart.addTotalPrice(double.parse(productPrice[index].toString()));
+                                              cart.addCounter();
+                                            }).onError((error, stackTrace) {
+                                              print(error.toString());
+                                            } );
+
+                                          },
+                                          child: Container(
+                                            height: 30,
+                                            width: 90,
+                                            decoration: BoxDecoration(
+                                                color: Colors.blue,
+                                                borderRadius: BorderRadius.circular(10)
+                                            ),
+                                            child: Center(
+                                              child: Text('Add to cart',style: TextStyle(color: Colors.white),),
+                                            ),
                                           ),
                                         ),
                                       )
